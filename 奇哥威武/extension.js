@@ -294,6 +294,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 trigger:{
                     player:"damageBegin",
                 },
+				priority:-100,
                 forced:true,
                 group:'qi_cichang1',
                 filter:function(event,player){
@@ -301,24 +302,22 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                     return true
                 },
                 init:function (player){
-                    player.storage.qi_cichang=0;
+                    player.storage.qi_cichang=2;
+					player.markSkill('qi_cichang');
                     player.storage.qi_cichang1=0;
                 },
                 content:function (){
-                    if(target.source==player){
-                        player.storage.qi_cichang1=trigger.num;
+					player.storage.qi_cichang1=trigger.num;
+					player.storage.qi_cichang+=trigger.num;
+					player.markSkill('qi_cichang');
+					player.syncStorage('qi_cichang');
+					trigger.nature='thunder'
+                    if(trigger.source==player){
                         trigger.num=0
                     }
-                    else{
-                        if(trigger.num>1){
-                            player.storage.qi_cichang1=trigger.num;
-                            trigger.num--;
-                        }
-                        player.storage.qi_cichang+=trigger.num;
-                        player.markSkill('qi_cichang');
-                        player.syncStorage('qi_cichang');
-                        trigger.nature='thunder'
-                    }
+					else if(trigger.num>1){
+						trigger.num--;
+					}
                 },
 				intro:{
 					content:'mark',

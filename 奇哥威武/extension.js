@@ -261,7 +261,6 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                     player.storage.qi_cichang--;
 					player.syncStorage('qi_cichang');
 					if(player.storage.qi_cichang==0) player.unmarkSkill('qi_cichang');
-					//game.addVideo('storage',player,player.storage.qi_cichang);
                     trigger.card.nature='thunder';
                     trigger.directHit=true;
     },
@@ -282,7 +281,6 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                     player.storage.qi_cichang--;
 					player.syncStorage('qi_cichang');
 					if(player.storage.qi_cichang==0) player.unmarkSkill('qi_cichang');
-					//game.addVideo('storage',player,player.storage.qi_cichang);
                     player.logSkill('qi_zhuzai',trigger.source);
                     trigger.untrigger();
                     trigger.finish();
@@ -297,24 +295,39 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                     player:"damageBegin",
                 },
                 forced:true,
+                group:'qi_cichang1',
+                filter:function(event,player){
+                    if(event.nature=='fire') return false;
+                    return true
+                },
                 init:function (player){
                     player.storage.qi_cichang=0;
                 },
                 content:function (){
-                    if(trigger.nature!='fire'){
-                        player.storage.qi_cichang+=trigger.num;
-						player.markSkill('qi_cichang');
-						player.syncStorage('qi_cichang');
-						//game.addVideo('storage',player,player.storage.qi_cichang);
-                        trigger.nature='thunder'
-                        if(trigger.num>1){
-                            trigger.num--;
-                        }
+                    player.storage.qi_cichang+=trigger.num;
+					player.markSkill('qi_cichang');
+					player.syncStorage('qi_cichang');
+                    trigger.nature='thunder'
+                    if(trigger.num>1){
+                        player.storage.qi_cichang1=true;
+                        trigger.num--;
                     }
                 },
 				intro:{
 					content:'mark',
 				},
+            },
+            qi_cichang1:{
+                trigger:{player:'damageAfter'},
+                forced:true,
+                filter:function(event,player){
+                    if(player.storage.qi_cichang1 && event.nature=='thunder') return true;
+                    return false;
+                },
+                content:function(){
+                    player.storage.qi_cichang1=false;
+                    trigger.num++;
+                }
             },
         },
         translate:{
@@ -331,10 +344,11 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
             qi_cibao:"磁暴",
             qi_cibao_info:"你可以将磁场存储的电磁随杀打出，此杀视为雷杀。",
             qi_zhuzai:"主宰",
-            qi_zhuzai_info:"消耗一个电磁来抵挡此次所受的伤害。",
+            qi_zhuzai_info:"消耗一个电磁来抵挡此次伤害。",
             qi_cichang:"磁场",
+            qi_cichang1:"磁场",
 			qi_cichang_bg:"电",
-            qi_cichang_info:"每当你即将受到非火属性的伤害，获得同数值的电磁；并且当你所受大于1点的雷电伤害时将减少1点。",
+            qi_cichang_info:"每当你受到非火属性的伤害时，获得同数值的电磁；并且当你所受的雷电伤害大于1时将减少1点；普通杀被视为雷杀。",
         },
     },
 },files:{"character":["万磁王·奇哥.jpg","雷神·奇哥.jpg"],"card":[],"skill":[]}})

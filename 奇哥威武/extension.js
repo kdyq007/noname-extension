@@ -302,6 +302,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 },
                 init:function (player){
                     player.storage.qi_cichang=0;
+                    player.storage.qi_cichang1=0;
                 },
                 content:function (){
                     if(target.source==player){
@@ -353,7 +354,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
             qi_zhuzai:"主宰",
             qi_zhuzai_info:"消耗一个电磁来抵挡此次伤害。",
             qi_cichang:"磁场",
-            qi_cichang1:"磁场",
+            qi_cichang1:"磁场1",
 			qi_cichang_bg:"电",
             qi_cichang_info:"每当你受到非火属性的伤害时，获得同数值的电磁；并且当你所受的雷电伤害大于1时将减少1点；普通杀被视为雷杀。",
         },

@@ -1,7 +1,7 @@
 game.import("extension",{name:"奇哥威武",content:function (config,pack){
-    
+
 },precontent:function (){
-    
+
 },help:{},config:{},package:{
     character:{
         character:{
@@ -223,7 +223,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
             var att=ai.get.attitude(_status.event.player,target);
             return 1-att;
         }).set('aicheck',check);
-        
+
         "step 1"
         if(result.bool){
             player.logSkill('qi_kongci',result.targets);
@@ -271,8 +271,8 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 },
                 direct:true,
                 filter:function (event,player){
-                    return player.storage.qi_cichang>0;
-    },
+                    return event.source!=player && player.storage.qi_cichang>0;
+                },
                 content:function (){
                     "step 0"
                 player.chooseBool('是否消耗一点电磁来抵挡此次伤害？');
@@ -304,13 +304,19 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                     player.storage.qi_cichang=0;
                 },
                 content:function (){
-                    player.storage.qi_cichang+=trigger.num;
-					player.markSkill('qi_cichang');
-					player.syncStorage('qi_cichang');
-                    trigger.nature='thunder'
-                    if(trigger.num>1){
-                        player.storage.qi_cichang1=true;
-                        trigger.num--;
+                    if(target.source==player){
+                        player.storage.qi_cichang1=trigger.num;
+                        trigger.num=0
+                    }
+                    else{
+                        if(trigger.num>1){
+                            player.storage.qi_cichang1=trigger.num;
+                            trigger.num--;
+                        }
+                        player.storage.qi_cichang+=trigger.num;
+                        player.markSkill('qi_cichang');
+                        player.syncStorage('qi_cichang');
+                        trigger.nature='thunder'
                     }
                 },
 				intro:{
@@ -325,8 +331,9 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                     return false;
                 },
                 content:function(){
-                    player.storage.qi_cichang1=false;
-                    trigger.num++;
+                    trigger.num=player.storage.qi_cichang1;
+                    player.storage.qi_cichang1=0;
+                    
                 }
             },
         },

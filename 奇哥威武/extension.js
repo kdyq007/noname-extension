@@ -1,12 +1,12 @@
 game.import("extension",{name:"奇哥威武",content:function (config,pack){
-    
+
 },precontent:function (){
-    
+
 },help:{},config:{},package:{
     character:{
         character:{
-            雷神·奇哥:["male","qun",4,["天雷","嘲讽","奇才","公道"],["zhu","boss","bossallowed"]],
-            万磁王·奇哥:["male","qun",4,["控磁","磁暴","cichang","主宰"],["zhu","boss","bossallowed"]],
+            雷神·奇哥:["male","qun",4,["qi_tianlei","qi_chaofeng","qi_qicai","qi_gongdao"],["zhu","boss","bossallowed"]],
+            万磁王·奇哥:["male","qun",4,["qi_kongci","qi_cibao","qi_cichang","qi_zhuzai"],["zhu","boss","bossallowed"]],
         },
         translate:{
             雷神·奇哥:"雷神·奇哥",
@@ -22,7 +22,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
     },
     skill:{
         skill:{
-            天雷:{
+            qi_tianlei:{
                 audio:"ext:奇哥威武:2",
                 trigger:{
                     player:"respond",
@@ -99,7 +99,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                     },
                 },
             },
-            嘲讽:{
+            qi_chaofeng:{
                 audio:"4",
                 enable:"phaseUse",
                 usable:1,
@@ -131,7 +131,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                     threaten:1.1,
                 },
             },
-            奇才:{
+            qi_qicai:{
                 audio:"ext:奇哥威武:2",
                 trigger:{
                     global:"judge",
@@ -184,7 +184,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                     },
                 },
             },
-            公道:{
+            qi_gongdao:{
                 audio:"ext:奇哥威武:2",
                 trigger:{
                     player:"damageEnd",
@@ -209,7 +209,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                     },
                 },
             },
-            控磁:{
+            qi_kongci:{
                 audioname:["tiesuo"],
                 trigger:{
                     player:["phaseBegin","phaseEnd"],
@@ -223,10 +223,10 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
             var att=ai.get.attitude(_status.event.player,target);
             return 1-att;
         }).set('aicheck',check);
-        
+
         "step 1"
         if(result.bool){
-            player.logSkill('kongci',result.targets);
+            player.logSkill('qi_kongci',result.targets);
             for(var i=0;i<result.targets.length;i++){
                 result.targets[i].link();
             }
@@ -241,14 +241,14 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                     expose:0.3,
                 },
             },
-            磁暴:{
+            qi_cibao:{
                 audio:"ext:奇哥威武:true",
                 trigger:{
                     player:"useCardToBefore",
                 },
                 priority:8,
                 filter:function (event,player){
-        if(event.card.name=='sha'&&player.storage.cichang>0) return true;
+        if(event.card.name=='sha'&&player.storage.qi_cichang>0) return true;
     },
                 check:function (event,player){
         var att=ai.get.attitude(player,event.target);
@@ -258,32 +258,30 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
         return att<=0;
     },
                 content:function (){
-                    player.storage.cichang--;
-					player.syncStorage('cichang');
-					if(player.storage.cichang==0) player.unmarkSkill('cichang');
-					//game.addVideo('storage',player,player.storage.cichang);
+                    player.storage.qi_cichang--;
+					player.syncStorage('qi_cichang');
+					if(player.storage.qi_cichang==0) player.unmarkSkill('qi_cichang');
                     trigger.card.nature='thunder';
                     trigger.directHit=true;
     },
             },
-            主宰:{
+            qi_zhuzai:{
                 trigger:{
                     player:"damageBefore",
                 },
                 direct:true,
                 filter:function (event,player){
-                    return player.storage.cichang>0;
-    },
+                    return event.source!=player && player.storage.qi_cichang>0;
+                },
                 content:function (){
                     "step 0"
                 player.chooseBool('是否消耗一点电磁来抵挡此次伤害？');
                 "step 1"
                 if(result.bool){
-                    player.storage.cichang--;
-					player.syncStorage('cichang');
-					if(player.storage.cichang==0) player.unmarkSkill('cichang');
-					//game.addVideo('storage',player,player.storage.cichang);
-                    player.logSkill('主宰',trigger.source);
+                    player.storage.qi_cichang--;
+					player.syncStorage('qi_cichang');
+					if(player.storage.qi_cichang==0) player.unmarkSkill('qi_cichang');
+                    player.logSkill('qi_zhuzai',trigger.source);
                     trigger.untrigger();
                     trigger.finish();
                 }
@@ -291,50 +289,74 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
 					//if(!trigger.source.isLinked()) trigger.source.link();
 				},
             },
-            cichang:{
+            qi_cichang:{
                 audio:"ext:奇哥威武:2",
                 trigger:{
                     player:"damageBegin",
                 },
                 forced:true,
+                group:'qi_cichang1',
+                filter:function(event,player){
+                    if(event.nature=='fire') return false;
+                    return true
+                },
                 init:function (player){
-                    player.storage.cichang=0;
+                    player.storage.qi_cichang=0;
+                    player.storage.qi_cichang1=0;
                 },
                 content:function (){
-                    if(trigger.nature!='fire'){
-                        player.storage.cichang+=trigger.num;
-						player.markSkill('cichang');
-						player.syncStorage('cichang');
-						//game.addVideo('storage',player,player.storage.cichang);
-                        trigger.nature='thunder'
+                    if(target.source==player){
+                        player.storage.qi_cichang1=trigger.num;
+                        trigger.num=0
+                    }
+                    else{
                         if(trigger.num>1){
+                            player.storage.qi_cichang1=trigger.num;
                             trigger.num--;
                         }
+                        player.storage.qi_cichang+=trigger.num;
+                        player.markSkill('qi_cichang');
+                        player.syncStorage('qi_cichang');
+                        trigger.nature='thunder'
                     }
                 },
 				intro:{
 					content:'mark',
 				},
             },
+            qi_cichang1:{
+                trigger:{player:'damageAfter'},
+                forced:true,
+                filter:function(event,player){
+                    if(player.storage.qi_cichang1 && event.nature=='thunder') return true;
+                    return false;
+                },
+                content:function(){
+                    trigger.num=player.storage.qi_cichang1;
+                    player.storage.qi_cichang1=0;
+                    
+                }
+            },
         },
         translate:{
-            天雷:"天雷",
-            天雷_info:"每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑桃，其受到两点雷电伤害；若结果为红桃，你回复两点体力；若为梅花或方片，其受到一点雷电伤害，然后你回复一点体力。",
-            嘲讽:"嘲讽",
-            嘲讽_info:"出牌阶段，你可以指定一名使用【杀】能攻击到你的角色，该角色必须对你使用一张【杀】，若该角色没有【杀】，你弃掉他的一张牌，每回合限一次。",
-            奇才:"奇才",
-            奇才_info:"任意一名角色的判定生效前，你可以打出一张牌替换之。",
-            公道:"公道",
-            公道_info:"每当你受到伤害后，你可以获得与伤害值数量相同的闪。",
-            控磁:"控磁",
-            控磁_info:"开场和结束时各能发起一次无数量限制的铁索连环。",
-            磁暴:"磁暴",
-            磁暴_info:"你可以将磁场存储的电磁随杀打出，此杀视为雷杀。",
-            主宰:"主宰",
-            主宰_info:"消耗一个电磁来抵挡此次所受的伤害。",
-            cichang:"磁场",
-			cichang_bg:"电",
-            cichang_info:"每当你即将受到非火属性的伤害，获得同数值的电磁；并且当你所受大于1点的雷电伤害时将减少1点。",
+            qi_tianlei:"天雷",
+            qi_tianlei_info:"每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑桃，其受到两点雷电伤害；若结果为红桃，你回复两点体力；若为梅花或方片，其受到一点雷电伤害，然后你回复一点体力。",
+            qi_chaofeng:"嘲讽",
+            qi_chaofeng_info:"出牌阶段，你可以指定一名使用【杀】能攻击到你的角色，该角色必须对你使用一张【杀】，若该角色没有【杀】，你弃掉他的一张牌，每回合限一次。",
+            qi_qicai:"奇才",
+            qi_qicai_info:"任意一名角色的判定生效前，你可以打出一张牌替换之。",
+            qi_gongdao:"公道",
+            qi_gongdao_info:"每当你受到伤害后，你可以获得与伤害值数量相同的闪。",
+            qi_kongci:"控磁",
+            qi_kongci_info:"开场和结束时各能发起一次无数量限制的铁索连环。",
+            qi_cibao:"磁暴",
+            qi_cibao_info:"你可以将磁场存储的电磁随杀打出，此杀视为雷杀。",
+            qi_zhuzai:"主宰",
+            qi_zhuzai_info:"消耗一个电磁来抵挡此次伤害。",
+            qi_cichang:"磁场",
+            qi_cichang1:"磁场1",
+			qi_cichang_bg:"电",
+            qi_cichang_info:"每当你受到非火属性的伤害时，获得同数值的电磁；并且当你所受的雷电伤害大于1时将减少1点；普通杀被视为雷杀。",
         },
     },
 },files:{"character":["万磁王·奇哥.jpg","雷神·奇哥.jpg"],"card":[],"skill":[]}})

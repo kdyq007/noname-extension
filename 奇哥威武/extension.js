@@ -6,7 +6,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
     character:{
         character:{
             雷神·奇哥:["male","qun",4,["天雷","嘲讽","奇才","公道"],["zhu","boss","bossallowed"]],
-            万磁王·奇哥:["male","qun",4,["控磁","磁暴","磁场","主宰"],["zhu","boss","bossallowed"]],
+            万磁王·奇哥:["male","qun",4,["控磁","磁暴","cichang","主宰"],["zhu","boss","bossallowed"]],
         },
         translate:{
             雷神·奇哥:"雷神·奇哥",
@@ -107,15 +107,13 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
         return target.num('he');
     },
                 content:function (){
-        "step 0"
-        target.chooseToUse({name:'sha'}, player, true, '嘲讽：必须对'+get.translation(player)+'使用一张杀，或令其弃置你的一张牌').set('targetRequired',true);
-        "step 1"
-        if(result.bool==false&&target.num('he')>0){
-            player.discardPlayerCard(target,'he',true);
-        }
-        else{
-            event.finish();
-        }
+		if(target.get('h','sha').length>0){
+			target.useCard(target.get('h','sha')[0], player);
+		}
+		else{
+			player.discardPlayerCard(target,'he',true);
+		}
+		event.finish();
     },
                 ai:{
                     order:4,
@@ -250,7 +248,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 },
                 priority:8,
                 filter:function (event,player){
-        if(event.card.name=='sha'&&player.storage.em) return true;
+        if(event.card.name=='sha'&&player.storage.cichang>0) return true;
     },
                 check:function (event,player){
         var att=ai.get.attitude(player,event.target);
@@ -260,42 +258,63 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
         return att<=0;
     },
                 content:function (){
-        trigger.card.nature='thunder';
-        player.storage.em--;
+                    player.storage.cichang--;
+					player.syncStorage('cichang');
+					if(player.storage.cichang==0) player.unmarkSkill('cichang');
+					//game.addVideo('storage',player,player.storage.cichang);
+                    trigger.card.nature='thunder';
+                    trigger.directHit=true;
     },
             },
             主宰:{
                 trigger:{
-                    player:"damageEnd",
+                    player:"damageBefore",
                 },
-                forced:true,
+                direct:true,
                 filter:function (event,player){
-        return (event.source&&event.source!=player);
+                    return player.storage.cichang>0;
     },
                 content:function (){
-        if(!player.isLinked()) player.link();
-        if(!trigger.source.isLinked()) trigger.source.link();
-        if(trigger.nature=='thunder' && trigger.num>1) trigger.num++;
-    },
+                    "step 0"
+                player.chooseBool('是否消耗一点电磁来抵挡此次伤害？');
+                "step 1"
+                if(result.bool){
+                    player.storage.cichang--;
+					player.syncStorage('cichang');
+					if(player.storage.cichang==0) player.unmarkSkill('cichang');
+					//game.addVideo('storage',player,player.storage.cichang);
+                    player.logSkill('主宰',trigger.source);
+                    trigger.untrigger();
+                    trigger.finish();
+                }
+					//if(!player.isLinked()) player.link();
+					//if(!trigger.source.isLinked()) trigger.source.link();
+				},
             },
-            磁场:{
+            cichang:{
                 audio:"ext:奇哥威武:2",
                 trigger:{
                     player:"damageBegin",
                 },
                 forced:true,
-                filter:function (event,player){
-        return true;
-    },
                 init:function (player){
-        player.storage.em=0;
-    },
+                    player.storage.cichang=0;
+                },
                 content:function (){
-        if(trigger.nature!='fire'){
-           player.storage.em+=trigger.num;
-           if(trigger.nature=='thunder' && trigger.num>1) trigger.num--;
-    }
-},
+                    if(trigger.nature!='fire'){
+                        player.storage.cichang+=trigger.num;
+						player.markSkill('cichang');
+						player.syncStorage('cichang');
+						//game.addVideo('storage',player,player.storage.cichang);
+                        trigger.nature='thunder'
+                        if(trigger.num>1){
+                            trigger.num--;
+                        }
+                    }
+                },
+				intro:{
+					content:'mark',
+				},
             },
         },
         translate:{
@@ -312,9 +331,10 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
             磁暴:"磁暴",
             磁暴_info:"你可以将磁场存储的电磁随杀打出，此杀视为雷杀。",
             主宰:"主宰",
-            主宰_info:"每当受到敌方伤害，自动将自己和敌方锁链。",
-            磁场:"磁场",
-            磁场_info:"每当你受到非火属性的伤害，你都能将此伤害转储为一份电磁；并且你所受大于1点的雷电伤害减少1点。",
+            主宰_info:"消耗一个电磁来抵挡此次所受的伤害。",
+            cichang:"磁场",
+			cichang_bg:"电",
+            cichang_info:"每当你即将受到非火属性的伤害，获得同数值的电磁；并且当你所受大于1点的雷电伤害时将减少1点。",
         },
     },
 },files:{"character":["万磁王·奇哥.jpg","雷神·奇哥.jpg"],"card":[],"skill":[]}})

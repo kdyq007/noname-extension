@@ -23,7 +23,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
     skill:{
         skill:{
             qi_tianlei:{
-                audio:"ext:奇哥威武:2",
+                audio:"leiji1",
                 trigger:{
                     player:"respond",
                 },
@@ -33,12 +33,12 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 direct:true,
                 content:function (){
         "step 0";
-        player.chooseTarget(get.prompt('releiji')).ai=function(target){
+        player.chooseTarget(get.prompt('leiji')).ai=function(target){
             return ai.get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
         };
         "step 1"
         if(result.bool){
-            player.logSkill('releiji',result.targets,'thunder');
+            player.logSkill('leiji',result.targets,'thunder');
             event.target=result.targets[0];
             event.target.judge(function(card){
                 var suit=get.suit(card);
@@ -100,7 +100,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 },
             },
             qi_chaofeng:{
-                audio:"4",
+                audio:"luoyi2",
                 enable:"phaseUse",
                 usable:1,
                 filterTarget:function (card,player,target){
@@ -132,7 +132,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 },
             },
             qi_qicai:{
-                audio:"ext:奇哥威武:2",
+                audio:"guicai1",
                 trigger:{
                     global:"judge",
                 },
@@ -185,7 +185,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 },
             },
             qi_gongdao:{
-                audio:"ext:奇哥威武:2",
+				audio:'weimu2',
                 trigger:{
                     player:"damageEnd",
                 },
@@ -210,15 +210,16 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 },
             },
             qi_kongci:{
-                audioname:["tiesuo"],
+				audio:"lianhuan12",
                 trigger:{
                     player:["phaseBegin","phaseEnd"],
                 },
+				direct:true,
                 content:function (){
         "step 0"
         var check;
         check=(game.players.length>=2);
-        player.chooseTarget('是否发动【控磁】？',[1,game.players.length],true,function(target){
+        player.chooseTarget('是否发动【控磁】？',[1,game.players.length],false,function(target){
             if(!_status.event.aicheck) return 0;
             var att=ai.get.attitude(_status.event.player,target);
             return 1-att;
@@ -230,9 +231,10 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
             for(var i=0;i<result.targets.length;i++){
                 result.targets[i].link();
             }
-            //trigger.finish();
-            //trigger.untrigger();
         }
+		else{
+			event.finish();
+		}
         "step 2"
         if(result.bool) game.delay();
     },
@@ -242,7 +244,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 },
             },
             qi_cibao:{
-                audio:"ext:奇哥威武:true",
+                audio:"lianhuan11",
                 trigger:{
                     player:"useCardToBefore",
                 },
@@ -266,6 +268,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
     },
             },
             qi_zhuzai:{
+				audio:'weimu1',
                 trigger:{
                     player:"damageBefore",
                 },
@@ -290,7 +293,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
 				},
             },
             qi_cichang:{
-                audio:"ext:奇哥威武:2",
+                audio:"lianhuan14",
                 trigger:{
                     player:"damageBegin",
                 },

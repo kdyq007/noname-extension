@@ -7,10 +7,12 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
         character:{
             雷神·奇哥:["male","qun",4,["qi_tianlei","qi_chaofeng","qi_qicai","qi_gongdao"],["zhu","boss","bossallowed"]],
             万磁王·奇哥:["male","qun",4,["qi_kongci","qi_cibao","qi_cichang","qi_zhuzai"],["zhu","boss","bossallowed"]],
+            火神·奇哥:["male","qun",4,["qi_huoqi","qi_lieyan","qi_fencheng","qi_huoqu"],["zhu","boss","bossallowed"]],
         },
         translate:{
             雷神·奇哥:"雷神·奇哥",
             万磁王·奇哥:"万磁王·奇哥",
+            火神·奇哥:"火神·奇哥",
         },
     },
     card:{
@@ -23,7 +25,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
     skill:{
         skill:{
             qi_tianlei:{
-                audio:"ext:奇哥威武:2",
+                audio:"leiji1",
                 trigger:{
                     player:"respond",
                 },
@@ -33,12 +35,12 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 direct:true,
                 content:function (){
         "step 0";
-        player.chooseTarget(get.prompt('releiji')).ai=function(target){
+        player.chooseTarget(get.prompt('leiji')).ai=function(target){
             return ai.get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
         };
         "step 1"
         if(result.bool){
-            player.logSkill('releiji',result.targets,'thunder');
+            player.logSkill('leiji',result.targets,'thunder');
             event.target=result.targets[0];
             event.target.judge(function(card){
                 var suit=get.suit(card);
@@ -100,20 +102,20 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 },
             },
             qi_chaofeng:{
-                audio:"4",
+                audio:"luoyi2",
                 enable:"phaseUse",
                 usable:1,
                 filterTarget:function (card,player,target){
         return target.num('he');
     },
                 content:function (){
-		if(target.get('h','sha').length>0){
-			target.useCard(target.get('h','sha')[0], player);
-		}
-		else{
-			player.discardPlayerCard(target,'he',true);
-		}
-		event.finish();
+        if(target.get('h','sha').length>0){
+            target.useCard(target.get('h','sha')[0], player);
+        }
+        else{
+            player.discardPlayerCard(target,'he',true);
+        }
+        event.finish();
     },
                 ai:{
                     order:4,
@@ -132,7 +134,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 },
             },
             qi_qicai:{
-                audio:"ext:奇哥威武:2",
+                audio:"guicai1",
                 trigger:{
                     global:"judge",
                 },
@@ -185,7 +187,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 },
             },
             qi_gongdao:{
-                audio:"ext:奇哥威武:2",
+                audio:"weimu2",
                 trigger:{
                     player:"damageEnd",
                 },
@@ -210,15 +212,16 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 },
             },
             qi_kongci:{
-                audioname:["tiesuo"],
+                audio:"lianhuan12",
                 trigger:{
                     player:["phaseBegin","phaseEnd"],
                 },
+                direct:true,
                 content:function (){
         "step 0"
         var check;
         check=(game.players.length>=2);
-        player.chooseTarget('是否发动【控磁】？',[1,game.players.length],true,function(target){
+        player.chooseTarget('是否发动【控磁】？',[1,game.players.length],false,function(target){
             if(!_status.event.aicheck) return 0;
             var att=ai.get.attitude(_status.event.player,target);
             return 1-att;
@@ -230,8 +233,9 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
             for(var i=0;i<result.targets.length;i++){
                 result.targets[i].link();
             }
-            //trigger.finish();
-            //trigger.untrigger();
+        }
+        else{
+            event.finish();
         }
         "step 2"
         if(result.bool) game.delay();
@@ -242,7 +246,7 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 },
             },
             qi_cibao:{
-                audio:"ext:奇哥威武:true",
+                audio:"lianhuan11",
                 trigger:{
                     player:"useCardToBefore",
                 },
@@ -259,13 +263,14 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
     },
                 content:function (){
                     player.storage.qi_cichang--;
-					player.syncStorage('qi_cichang');
-					if(player.storage.qi_cichang==0) player.unmarkSkill('qi_cichang');
+                    player.syncStorage('qi_cichang');
+                    if(player.storage.qi_cichang==0) player.unmarkSkill('qi_cichang');
                     trigger.card.nature='thunder';
                     trigger.directHit=true;
     },
             },
             qi_zhuzai:{
+                audio:"weimu1",
                 trigger:{
                     player:"damageBefore",
                 },
@@ -279,63 +284,147 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 "step 1"
                 if(result.bool){
                     player.storage.qi_cichang--;
-					player.syncStorage('qi_cichang');
-					if(player.storage.qi_cichang==0) player.unmarkSkill('qi_cichang');
+                    player.syncStorage('qi_cichang');
+                    if(player.storage.qi_cichang==0) player.unmarkSkill('qi_cichang');
                     player.logSkill('qi_zhuzai',trigger.source);
                     trigger.untrigger();
                     trigger.finish();
                 }
-					//if(!player.isLinked()) player.link();
-					//if(!trigger.source.isLinked()) trigger.source.link();
-				},
+                    //if(!player.isLinked()) player.link();
+                    //if(!trigger.source.isLinked()) trigger.source.link();
+                },
             },
             qi_cichang:{
-                audio:"ext:奇哥威武:2",
+                audio:"lianhuan14",
                 trigger:{
                     player:"damageBegin",
                 },
+                priority:-100,
                 forced:true,
-                group:'qi_cichang1',
-                filter:function(event,player){
+                group:"qi_cichang1",
+                filter:function (event,player){
                     if(event.nature=='fire') return false;
                     return true
                 },
                 init:function (player){
-                    player.storage.qi_cichang=0;
+                    player.storage.qi_cichang=2;
+                    player.markSkill('qi_cichang');
                     player.storage.qi_cichang1=0;
                 },
                 content:function (){
-                    if(target.source==player){
-                        player.storage.qi_cichang1=trigger.num;
+                    player.storage.qi_cichang1=trigger.num;
+                    player.storage.qi_cichang+=trigger.num;
+                    player.markSkill('qi_cichang');
+                    player.syncStorage('qi_cichang');
+                    trigger.nature='thunder'
+                    if(trigger.source==player){
                         trigger.num=0
                     }
-                    else{
-                        if(trigger.num>1){
-                            player.storage.qi_cichang1=trigger.num;
-                            trigger.num--;
-                        }
-                        player.storage.qi_cichang+=trigger.num;
-                        player.markSkill('qi_cichang');
-                        player.syncStorage('qi_cichang');
-                        trigger.nature='thunder'
+                    else if(trigger.num>1){
+                        trigger.num--;
                     }
                 },
-				intro:{
-					content:'mark',
-				},
+                intro:{
+                    content:"mark",
+                },
             },
             qi_cichang1:{
-                trigger:{player:'damageAfter'},
-                forced:true,
-                filter:function(event,player){
-                    if(player.storage.qi_cichang1 && event.nature=='thunder') return true;
-                    return false;
+                trigger:{
+                    player:"damageAfter",
                 },
-                content:function(){
-                    trigger.num=player.storage.qi_cichang1;
-                    player.storage.qi_cichang1=0;
-                    
-                }
+                forced:true,
+                filter:function (event,player){
+        if(player.storage.qi_cichang1 && event.nature=='thunder') return true;
+        return false;
+    },
+                content:function (){
+        trigger.num=player.storage.qi_cichang1;
+        player.storage.qi_cichang1=0;
+        
+    },
+            },
+            qi_huoqi:{
+                trigger:{
+                    player:"useCardToBefore",
+                },
+                forced:true,
+                priority:9,
+                filter:function (event,player){
+        if(event.card.name=='sha') return true;
+    },
+                content:function (){
+        trigger.card.nature='fire';
+    },
+            },
+            qi_lieyan:{
+                trigger:{
+                    global:"damageEnd",
+                },
+                forced:true,
+                group:"qi_lieyan1",
+                filter:function (event,player){
+        if(event.source==player&&event.player!=player&&event.card&&(event.card.name=='sha'||event.card.name=='huogong')){
+            return true;
+        }
+        return false;
+    },
+	intro:{
+                    content:"mark",
+                },
+	content:function (){
+        trigger.player.storage.qi_lieyan=2;
+        trigger.player.markSkill('qi_lieyan');
+        trigger.player.syncStorage('qi_lieyan');
+    },
+            },
+            qi_lieyan1:{
+                trigger:{
+                    global:"phaseBegin",
+                },
+                forced:true,
+                filter:function (event,player){
+        return event.player.storage.qi_lieyan;
+    },
+	
+                content:function (){
+					trigger.source=player;
+        trigger.player.loseHp();
+        trigger.player.storage.qi_lieyan--;
+        trigger.player.syncStorage('qi_lieyan');
+        if(trigger.player.storage.qi_lieyan==0){
+            trigger.player.unmarkSkill('qi_lieyan');
+        } 
+    },
+            },
+			
+			qi_fencheng:{
+				enable:'phaseUse',
+				usable:1,
+				position:'he',
+				filterCard:true,
+				selectCard:2,
+				prompt:'弃置两张牌来对每个人使用一张杀',
+				selectTarget:-1,
+				filterTarget:function(card,player,target){
+					return target!=player;
+				},
+				content:function(){
+					player.useCard({name:'sha'},target,false);
+				},
+			},
+			
+			qi_huoqu:{
+                trigger:{
+                    player:"damageBefore",
+                },
+                direct:true,
+                filter:function (event,player){
+                    return event.nature=='fire';
+                },
+                content:function (){
+                    trigger.untrigger();
+                    trigger.finish();
+                },
             },
         },
         translate:{
@@ -355,8 +444,18 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
             qi_zhuzai_info:"消耗一个电磁来抵挡此次伤害。",
             qi_cichang:"磁场",
             qi_cichang1:"磁场1",
-			qi_cichang_bg:"电",
+            qi_cichang_bg:"电",
             qi_cichang_info:"每当你受到非火属性的伤害时，获得同数值的电磁；并且当你所受的雷电伤害大于1时将减少1点；普通杀被视为雷杀。",
+            qi_huoqi:"火契",
+            qi_huoqi_info:"你的杀视为火杀。",
+            qi_lieyan:"烈焰",
+			qi_lieyan1:"烈焰1",
+            qi_lieyan_info:"你的火杀造成伤害后会附上灼烧效果，每回合灼烧1点血，持续两回合，此效果不可叠加",
+			qi_fencheng:"焚城",
+            qi_fencheng_info:"你可以丢弃两张牌，相当于依次对每个人出了一张杀。",
+			qi_huoqu:"火躯",
+			qi_huoqu_info:"你免疫一切火伤害。",
+			
         },
     },
-},files:{"character":["万磁王·奇哥.jpg","雷神·奇哥.jpg"],"card":[],"skill":[]}})
+},files:{"character":["万磁王·奇哥.jpg","火神·奇哥.jpg","雷神·奇哥.jpg"],"card":[],"skill":[]}})

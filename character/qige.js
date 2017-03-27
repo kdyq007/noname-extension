@@ -1,29 +1,19 @@
-game.import("extension",{name:"奇哥威武",content:function (config,pack){
-
-},precontent:function (){
-
-},help:{},config:{},package:{
-    character:{
-        character:{
-            雷神·奇哥:["male","qun",4,["qi_tianlei","qi_chaofeng","qi_qicai","qi_gongdao"],["zhu","boss","bossallowed"]],
-            万磁王·奇哥:["male","qun",4,["qi_kongci","qi_cibao","qi_cichang","qi_zhuzai"],["zhu","boss","bossallowed"]],
-            火神·奇哥:["male","qun",4,["qi_huoqi","qi_lieyan","qi_fencheng","qi_huoqu"],["zhu","boss","bossallowed"]],
-        },
-        translate:{
-            雷神·奇哥:"雷神·奇哥",
-            万磁王·奇哥:"万磁王·奇哥",
-            火神·奇哥:"火神·奇哥",
-        },
-    },
-    card:{
-        card:{
-        },
-        translate:{
-        },
-        list:[],
-    },
-    skill:{
-        skill:{
+'use strict';
+character.qige={
+	connect:true,
+	character:{
+		qi_leishen:["male","qun",4,["qi_tianlei","qi_chaofeng","qi_qicai","qi_gongdao"],["zhu","boss","bossallowed"]],
+		qi_wanciwang:["male","qun",4,["qi_kongci","qi_cibao","qi_cichang","qi_zhuzai"],["zhu","boss","bossallowed"]],
+		qi_huoshen:["male","qun",4,["qi_huoqi","qi_lieyan","qi_fencheng","qi_huoqu"],["zhu","boss","bossallowed"]],
+	},
+	characterIntro:{
+		qi_leishen:'雷神·奇哥',
+		qi_wanciwang:'万磁王·奇哥',
+		qi_huoshen:'火神·奇哥',
+	},
+	perfectPair:{
+	},
+	skill:{
             qi_tianlei:{
                 audio:"leiji1",
                 trigger:{
@@ -426,36 +416,38 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                     trigger.finish();
                 },
             },
-        },
-        translate:{
-            qi_tianlei:"天雷",
-            qi_tianlei_info:"每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑桃，其受到两点雷电伤害；若结果为红桃，你回复两点体力；若为梅花或方片，其受到一点雷电伤害，然后你回复一点体力。",
-            qi_chaofeng:"嘲讽",
-            qi_chaofeng_info:"出牌阶段，你可以指定一名使用【杀】能攻击到你的角色，该角色必须对你使用一张【杀】，若该角色没有【杀】，你弃掉他的一张牌，每回合限一次。",
-            qi_qicai:"奇才",
-            qi_qicai_info:"任意一名角色的判定生效前，你可以打出一张牌替换之。",
-            qi_gongdao:"公道",
-            qi_gongdao_info:"每当你受到伤害后，你可以获得与伤害值数量相同的闪。",
-            qi_kongci:"控磁",
-            qi_kongci_info:"开场和结束时各能发起一次无数量限制的铁索连环。",
-            qi_cibao:"磁暴",
-            qi_cibao_info:"你可以将磁场存储的电磁随杀打出，此杀视为雷杀。",
-            qi_zhuzai:"主宰",
-            qi_zhuzai_info:"消耗一个电磁来抵挡此次伤害。",
-            qi_cichang:"磁场",
-            qi_cichang1:"磁场1",
-            qi_cichang_bg:"电",
-            qi_cichang_info:"每当你受到非火属性的伤害时，获得同数值的电磁；并且当你所受的雷电伤害大于1时将减少1点；普通杀被视为雷杀。",
-            qi_huoqi:"火契",
-            qi_huoqi_info:"你的杀视为火杀。",
-            qi_lieyan:"烈焰",
-			qi_lieyan1:"烈焰1",
-            qi_lieyan_info:"你的火杀造成伤害后会附上灼烧效果，每回合灼烧1点血，持续两回合，此效果不可叠加",
-			qi_fencheng:"焚城",
-            qi_fencheng_info:"你可以丢弃两张牌，相当于依次对每个人出了一张杀。",
-			qi_huoqu:"火躯",
-			qi_huoqu_info:"你免疫一切火伤害。",
-			
-        },
-    },
-},files:{"character":["万磁王·奇哥.jpg","火神·奇哥.jpg","雷神·奇哥.jpg"],"card":[],"skill":[]}})
+	},
+	translate:{
+		qi_leishen:"雷神奇哥",
+		qi_wanciwang:"万磁王奇哥",
+		qi_huoshen:"火神奇哥",
+		
+		qi_tianlei:"天雷",
+		qi_tianlei_info:"每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑桃，其受到两点雷电伤害；若结果为红桃，你回复两点体力；若为梅花或方片，其受到一点雷电伤害，然后你回复一点体力。",
+		qi_chaofeng:"嘲讽",
+		qi_chaofeng_info:"出牌阶段，你可以指定一名使用【杀】能攻击到你的角色，该角色必须对你使用一张【杀】，若该角色没有【杀】，你弃掉他的一张牌，每回合限一次。",
+		qi_qicai:"奇才",
+		qi_qicai_info:"任意一名角色的判定生效前，你可以打出一张牌替换之。",
+		qi_gongdao:"公道",
+		qi_gongdao_info:"每当你受到伤害后，你可以获得与伤害值数量相同的闪。",
+		qi_kongci:"控磁",
+		qi_kongci_info:"开场和结束时各能发起一次无数量限制的铁索连环。",
+		qi_cibao:"磁暴",
+		qi_cibao_info:"你可以将磁场存储的电磁随杀打出，此杀视为雷杀。",
+		qi_zhuzai:"主宰",
+		qi_zhuzai_info:"消耗一个电磁来抵挡此次伤害。",
+		qi_cichang:"磁场",
+		qi_cichang1:"磁场1",
+		qi_cichang_bg:"电",
+		qi_cichang_info:"每当你受到非火属性的伤害时，获得同数值的电磁；并且当你所受的雷电伤害大于1时将减少1点；普通杀被视为雷杀。",
+		qi_huoqi:"火契",
+		qi_huoqi_info:"你的杀视为火杀。",
+		qi_lieyan:"烈焰",
+		qi_lieyan1:"烈焰1",
+		qi_lieyan_info:"你的火杀造成伤害后会附上灼烧效果，每回合灼烧1点血，持续两回合，此效果不可叠加",
+		qi_fencheng:"焚城",
+		qi_fencheng_info:"你可以丢弃两张牌，相当于依次对每个人出了一张杀。",
+		qi_huoqu:"火躯",
+		qi_huoqu_info:"你免疫一切火伤害。",
+	},
+}

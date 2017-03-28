@@ -193,6 +193,7 @@ character.qige = {
         },
         qi_kongci: {
             audio: "lianhuan12",
+			direct:true,
             trigger: {
                 player: ["phaseBegin", "phaseEnd"],
             },

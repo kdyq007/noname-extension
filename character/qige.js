@@ -1,29 +1,17 @@
-game.import("extension",{name:"奇哥威武",content:function (config,pack){
-
-},precontent:function (){
-
-},help:{},config:{},package:{
-    character:{
-        character:{
-            雷神·奇哥:["male","qun",4,["qi_tianlei","qi_chaofeng","qi_qicai","qi_gongdao"],["zhu","boss","bossallowed"]],
-            万磁王·奇哥:["male","qun",4,["qi_kongci","qi_cibao","qi_cichang","qi_zhuzai"],["zhu","boss","bossallowed"]],
-            火神·奇哥:["male","qun",4,["qi_huoqi","qi_lieyan","qi_fencheng","qi_huoqu"],["zhu","boss","bossallowed"]],
-        },
-        translate:{
-            雷神·奇哥:"雷神·奇哥",
-            万磁王·奇哥:"万磁王·奇哥",
-            火神·奇哥:"火神·奇哥",
-        },
-    },
-    card:{
-        card:{
-        },
-        translate:{
-        },
-        list:[],
-    },
-    skill:{
-        skill:{
+'use strict';
+character.qige={
+	connect:true,
+	character:{
+		qi_leishen:["male","qun",4,["qi_tianlei","qi_chaofeng","qi_qicai","qi_gongdao"]],
+		qi_wanciwang:["male","qun",4,["qi_kongci","qi_cibao","qi_cichang","qi_zhuzai"]],
+		qi_huoshen:["male","qun",4,["qi_huoqi","qi_lieyan","qi_fencheng","qi_huoqu"]],
+	},
+	characterIntro:{
+		qi_leishen:'雷神·奇哥',
+		qi_wanciwang:'万磁王·奇哥',
+		qi_huoshen:'火神·奇哥',
+	},
+	skill:{
             qi_tianlei:{
                 audio:"leiji1",
                 trigger:{
@@ -216,16 +204,34 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 trigger:{
                     player:["phaseBegin","phaseEnd"],
                 },
-                direct:true,
+				check:function(event,player){
+					if(player.hp>1&&!player.isLinked) return true;
+					for(var i=0;i<game.players.length;i++){
+						if(ai.get.attitude(player,game.players[i])<=0&&!game.players[i].isLinked()){
+							return true;
+						}
+					}
+					return false;
+				},
                 content:function (){
         "step 0"
-        var check;
-        check=(game.players.length>=2);
-        player.chooseTarget('是否发动【控磁】？',[1,game.players.length],false,function(target){
-            if(!_status.event.aicheck) return 0;
-            var att=ai.get.attitude(_status.event.player,target);
-            return 1-att;
-        }).set('aicheck',check);
+        player.chooseTarget('是否发动【控磁】？',[1,game.players.length],false).ai=function(target){
+			if (target==player){
+				if(player.hp>1&&!target.isLinked()){
+					return true;
+				}
+				else{
+					return false;
+				}
+			}
+			if(ai.get.attitude(player,target)>0){
+				if(target.isLinked()) return true;
+			}
+			else{
+				if(!target.isLinked()) return true;
+			}
+			return false;
+		}
 
         "step 1"
         if(result.bool){
@@ -255,11 +261,19 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
         if(event.card.name=='sha'&&player.storage.qi_cichang>0) return true;
     },
                 check:function (event,player){
-        var att=ai.get.attitude(player,event.target);
-        if(event.target.hasSkillTag('nofire')){
-            return att>0;
-        }
-        return att<=0;
+				var good=0,bad=0;
+                for(var i=0;i<game.players.length;i++){
+                    if(game.players[i].isLinked()&&player!=game.players[i]){
+                        if(ai.get.attitude(player,game.players[i])>0){
+								good++;
+							}
+							else{
+								bad++;
+							}
+                    }
+                }
+					if(bad>good) return 1;
+					return -1;
     },
                 content:function (){
                     player.storage.qi_cichang--;
@@ -278,6 +292,17 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                 filter:function (event,player){
                     return event.source!=player && player.storage.qi_cichang>0;
                 },
+				check:function (event,player){
+					if(player.hp==1) return true;
+					if(event.num>1) return false;
+					if(player.isLinked()){
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].hp<=event.num&&game.players[i].isLinked()) return false;
+						}
+					}
+					if(player.storage.qi_cichang>1) return true;
+					return false;
+				},
                 content:function (){
                     "step 0"
                 player.chooseBool('是否消耗一点电磁来抵挡此次伤害？');
@@ -396,7 +421,6 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
         } 
     },
             },
-			
 			qi_fencheng:{
 				enable:'phaseUse',
 				usable:1,
@@ -412,7 +436,6 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
 					player.useCard({name:'sha'},target,false);
 				},
 			},
-			
 			qi_huoqu:{
                 trigger:{
                     player:"damageBefore",
@@ -426,36 +449,37 @@ game.import("extension",{name:"奇哥威武",content:function (config,pack){
                     trigger.finish();
                 },
             },
-        },
-        translate:{
-            qi_tianlei:"天雷",
-            qi_tianlei_info:"每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑桃，其受到两点雷电伤害；若结果为红桃，你回复两点体力；若为梅花或方片，其受到一点雷电伤害，然后你回复一点体力。",
-            qi_chaofeng:"嘲讽",
-            qi_chaofeng_info:"出牌阶段，你可以指定一名使用【杀】能攻击到你的角色，该角色必须对你使用一张【杀】，若该角色没有【杀】，你弃掉他的一张牌，每回合限一次。",
-            qi_qicai:"奇才",
-            qi_qicai_info:"任意一名角色的判定生效前，你可以打出一张牌替换之。",
-            qi_gongdao:"公道",
-            qi_gongdao_info:"每当你受到伤害后，你可以获得与伤害值数量相同的闪。",
-            qi_kongci:"控磁",
-            qi_kongci_info:"开场和结束时各能发起一次无数量限制的铁索连环。",
-            qi_cibao:"磁暴",
-            qi_cibao_info:"你可以将磁场存储的电磁随杀打出，此杀视为雷杀。",
-            qi_zhuzai:"主宰",
-            qi_zhuzai_info:"消耗一个电磁来抵挡此次伤害。",
-            qi_cichang:"磁场",
-            qi_cichang1:"磁场1",
-            qi_cichang_bg:"电",
-            qi_cichang_info:"每当你受到非火属性的伤害时，获得同数值的电磁；并且当你所受的雷电伤害大于1时将减少1点；普通杀被视为雷杀。",
-            qi_huoqi:"火契",
-            qi_huoqi_info:"你的杀视为火杀。",
-            qi_lieyan:"烈焰",
-			qi_lieyan1:"烈焰1",
-            qi_lieyan_info:"你的火杀造成伤害后会附上灼烧效果，每回合灼烧1点血，持续两回合，此效果不可叠加",
-			qi_fencheng:"焚城",
-            qi_fencheng_info:"你可以丢弃两张牌，相当于依次对每个人出了一张杀。",
-			qi_huoqu:"火躯",
-			qi_huoqu_info:"你免疫一切火伤害。",
-			
-        },
-    },
-},files:{"character":["万磁王·奇哥.jpg","火神·奇哥.jpg","雷神·奇哥.jpg"],"card":[],"skill":[]}})
+	},
+	translate:{
+		qi_leishen:"雷神奇哥",
+		qi_wanciwang:"万磁王奇哥",
+		qi_huoshen:"火神奇哥",
+		
+		qi_tianlei:"天雷",
+		qi_chaofeng:"嘲讽",
+		qi_qicai:"奇才",
+		qi_gongdao:"公道",
+		qi_kongci:"控磁",
+		qi_cibao:"磁暴",
+		qi_zhuzai:"主宰",
+		qi_cichang:"磁场",
+		qi_cichang1:"磁场1",
+		qi_huoqi:"火契",
+		qi_lieyan:"烈焰",
+		qi_lieyan1:"烈焰1",
+		qi_fencheng:"焚城",
+		qi_huoqu:"火躯",
+		qi_tianlei_info:"每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑桃，其受到两点雷电伤害；若结果为红桃，你回复两点体力；若为梅花或方片，其受到一点雷电伤害，然后你回复一点体力。",
+		qi_chaofeng_info:"出牌阶段，你可以指定一名使用【杀】能攻击到你的角色，该角色必须对你使用一张【杀】，若该角色没有【杀】，你弃掉他的一张牌，每回合限一次。",
+		qi_qicai_info:"任意一名角色的判定生效前，你可以打出一张牌替换之。",
+		qi_gongdao_info:"每当你受到伤害后，你可以获得与伤害值数量相同的闪。",
+		qi_kongci_info:"开场和结束时各能发起一次无数量限制的铁索连环。",
+		qi_cibao_info:"你可以将磁场存储的电磁随杀打出，此杀视为雷杀。",
+		qi_zhuzai_info:"消耗一个电磁来抵挡此次伤害。",
+		qi_cichang_info:"每当你受到非火属性的伤害时，获得同数值的电磁；并且当你所受的雷电伤害大于1时将减少1点；普通杀被视为雷杀。",
+		qi_huoqi_info:"你的杀视为火杀。",
+		qi_lieyan_info:"你的火杀造成伤害后会附上灼烧效果，每回合灼烧1点血，持续两回合，此效果不可叠加",
+		qi_fencheng_info:"你可以丢弃两张牌，相当于依次对每个人出了一张杀。",
+		qi_huoqu_info:"你免疫一切火伤害。",
+	},
+}

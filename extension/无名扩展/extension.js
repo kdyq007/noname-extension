@@ -6,7 +6,7 @@ game.import("extension",{name:"无名扩展",content:function (config,pack){
     character:{
         character:{
             test1:["male","wei",4,["去除技能"],[]],
-            test2:["male","wei",4,["保留技能","去除技能","test1","qi_xiongsuan","qi_xiongsuan1"],[]],
+            test2:["male","shu",4,["保留技能","去除技能","test1","qi_xiongsuan"],[]],
         },
         translate:{
             test1:"test1",
@@ -50,15 +50,15 @@ game.import("extension",{name:"无名扩展",content:function (config,pack){
                 enable:"phaseUse",
                 unique:true,
                 mark:true,
+				init:function (player){
+                    player.storage.qi_xiongsuan=false;
+                },
                 filterCard:true,
                 filterTarget:function (card,player,target){
                     //return target.group==player.group&&target!=player;
                     return target.group==player.group;
                 },
                 prompt:"弃置一张手牌并选择一名与你势力相同的角色",
-                init:function (player){
-                    player.storage.qi_xiongsuan=false;
-                },
                 content:function (){
 					'step 0'
                     target.damage();
@@ -71,21 +71,36 @@ game.import("extension",{name:"无名扩展",content:function (config,pack){
 						var _skill = get.info(target.skills[i]);
 						if(_skill.unique && _skill.unique==true) unique_skills.push(target.skills[i]);
 					}
-					player.chooseControl(unique_skills);
+					player.chooseControl(unique_skills).set('prompt','选择要重置的技能');;
 					'step 1'
 					var _skill = result.control;
 					console.log(_skill)
 					if(_skill){
-						target.markSkill(_skill);
-						target.enableSkill(_skill+'_awake');
-						target.syncStorage(_skill);
-						target.awakenedSkills.remove(_skill);
+						player.storage.recove_target=target;
+						player.storage.recove_target_skill=_skill;
+						player.addTempSkill('qi_xiongsuan1',{player:'phaseAfter'});
 					}
                 },
                 intro:{
                     content:"limited",
                 },
             },
+			qi_xiongsuan1:{
+				trigger:{
+					player:'phaseEnd',
+				},
+				forced:true,
+				content:function(){
+					_target=player.storage.recove_target;
+					_skill=player.storage.recove_target_skill;
+					_target.storage[_skill]=false;
+					_target.markSkill(_skill);
+					_target.enableSkill(_skill+'_awake');
+					_target.syncStorage(_skill);
+					_target.awakenedSkills.remove(_skill);
+	
+				},
+			},
         },
         translate:{
             去除技能:"去除技能",

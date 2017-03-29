@@ -193,6 +193,7 @@ character.qige = {
         },
         qi_kongci: {
             audio: "lianhuan12",
+			direct:true,
             trigger: {
                 player: ["phaseBegin", "phaseEnd"],
             },
@@ -289,10 +290,11 @@ character.qige = {
                 effect: {
                     player: function (card, player, target, current) {
                         if (player.hp == 1) return 1;
-                        if (get.tag(card, 'damage') > 1) return -2;
+						var _damage = get.tag(card, 'damage');
+                        if (_damage > 1) return -2;
                         if (player.isLinked()) {
                             for (var i = 0; i < game.players.length; i++) {
-                                if (game.players[i].hp <= event.num && game.players[i].isLinked()) return false;
+                                if (game.players[i].hp <= _damage && game.players[i].isLinked()) return false;
                             }
                         }
                         if (player.storage.qi_cichang > 1) return true;

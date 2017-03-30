@@ -259,6 +259,9 @@ character.qige = {
                     if (game.players[i].isLinked() && player != game.players[i]) {
                         if (ai.get.attitude(player, game.players[i]) > 0) {
                             good++;
+                            if(game.players[i].hp==1&&player.identity!='fan'&&player.identity!='nei'){
+                                return -2;
+                            }
                         }
                         else {
                             bad++;
@@ -284,23 +287,6 @@ character.qige = {
             direct: true,
             filter: function (event, player) {
                 return event.source != player && player.storage.qi_cichang > 0;
-            },
-            ai: {
-                maixue: true,
-                effect: {
-                    player: function (card, player, target, current) {
-                        if (player.hp == 1) return 1;
-						var _damage = get.tag(card, 'damage');
-                        if (_damage > 1) return -2;
-                        if (player.isLinked()) {
-                            for (var i = 0; i < game.players.length; i++) {
-                                if (game.players[i].hp <= _damage && game.players[i].isLinked()) return false;
-                            }
-                        }
-                        if (player.storage.qi_cichang > 1) return true;
-                        return false;
-                    },
-                },
             },
             check: function (event, player) {
                 if (player.hp == 1) return true;
@@ -507,7 +493,7 @@ character.qige = {
         qi_kongci_info: "开场和结束时各能发起一次无数量限制的铁索连环。",
         qi_cibao_info: "你可以将磁场存储的电磁随杀打出，此杀视为雷杀。",
         qi_zhuzai_info: "消耗一个电磁来抵挡此次伤害。",
-        qi_cichang_info: "每当你受到非火属性的伤害时，获得同数值的电磁；并且当你所受的雷电伤害大于1时将减少1点；普通杀被视为雷杀。",
+        qi_cichang_info: "每当你受到非火属性的伤害时，获得同数值的电磁；并且当你所受的雷电伤害大于1时将减少1点,对自己造成的伤害为0(铁索传导仍是原始伤害)；普通杀被视为雷杀。",
         qi_huoqi_info: "你的杀视为火杀。",
         qi_lieyan_info: "你的火杀造成伤害后会附上灼烧效果，每回合灼烧1点血，持续两回合，此效果不可叠加",
         qi_fencheng_info: "你可以丢弃两张牌，相当于依次对每个人出了一张杀。",

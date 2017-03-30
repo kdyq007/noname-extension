@@ -6,7 +6,7 @@ game.import("extension",{name:"无名扩展",content:function (config,pack){
     character:{
         character:{
             test1:["male","wei",4,["去除技能","huashen"],[]],
-            test2:["male","shu",4,["保留技能","去除技能","test1","qi_xiongsuan","qi_huashen"],[]],
+            test2:["male","shu",4,["保留技能","去除技能","test1","qi_xiongsuan","qi_huashen","qi_xinsheng"],[]],
         },
         translate:{
             test1:"test1",
@@ -108,12 +108,28 @@ game.import("extension",{name:"无名扩展",content:function (config,pack){
                     player:player,
                 }
             },
-                get:function (player,num){
+                get:function (player,num,add){
                     player.storage.qi_huashen.selects = [];
                     if(typeof num!='number') num=1;
+                    if(typeof add!='bool') add=false;
                 while(num--){
                     var name=player.storage.qi_huashen.list.randomRemove();
-                    player.storage.qi_huashen.selects.push(name);
+					if(add){
+						console.log(add);
+						var skills=lib.character[name][3].slice(0);
+						for(var i=0;i<skills.length;i++){
+							var info=lib.skill[skills[i]];
+							if(info.unique&&!info.gainable){
+								skills.splice(i--,1);
+							}
+						}
+						player.storage.qi_huashen.owned[name]=skills;
+						player.popup(name);
+						game.log(player,'获得了一个化身');
+					}
+					else{
+						player.storage.qi_huashen.selects.push(name);
+					}
                 }
             },
                 group:["qi_huashen1","qi_huashen2"],
@@ -155,7 +171,6 @@ game.import("extension",{name:"无名扩展",content:function (config,pack){
                 },
                 mark:true,
             },
-
             qi_huashen1:{
                 audio:"ext:无名扩展:2",
                 trigger:{
@@ -231,13 +246,13 @@ game.import("extension",{name:"无名扩展",content:function (config,pack){
                             player.storage.qi_huashen.owned[name]=skills;
                             player.popup(name);
                             game.log(player,'获得了一个化身');
-							player.storage.qi_huashen.selects.remove(name);
+                            player.storage.qi_huashen.selects.remove(name);
                         }
-						var recycles = player.storage.qi_huashen.selects;
-						for(var i=0;i<recycles.length;i++){
-							player.storage.qi_huashen.list.push(recycles[i]);
-						}
-						player.storage.qi_huashen.selects=[];
+                        var recycles = player.storage.qi_huashen.selects;
+                        for(var i=0;i<recycles.length;i++){
+                            player.storage.qi_huashen.list.push(recycles[i]);
+                        }
+                        player.storage.qi_huashen.selects=[];
                         if (list.length == 1){
                             ui.clear();
                             player.chooseButton(ui.create.dialog('请选择一个需被替换的武将',[names,'character']),false).selectButton=function(result){
@@ -273,7 +288,7 @@ game.import("extension",{name:"无名扩展",content:function (config,pack){
                     event.clickControl=function(link){
                         if(link!='cancel2'){
                             var currentname=event.dialog.querySelector('.selected.button').link;
-							console.log(currentname);
+                            console.log(currentname);
                             var mark=player.marks.qi_huashen;
                             if(trigger.name=='game'){
                                 mark.hide();
@@ -298,7 +313,7 @@ game.import("extension",{name:"无名扩展",content:function (config,pack){
                                     mark.firstChild.remove();
                                 }
                                 mark.setBackground(currentname,'character');
-								mark.show();
+                                mark.show();
                             }
                             player.addAdditionalSkill('qi_huashen',link);
                             player.logSkill('qi_huashen2');
@@ -414,32 +429,35 @@ game.import("extension",{name:"无名扩展",content:function (config,pack){
                     player:"useSkillAfter",
                 },
                 forced:true,
-                content:function(){
-					console.log('OKOKOK');
+                content:function (){
+                    console.log('OKOKOK');
                     player.removeAdditionalSkill('qi_huashen', trigger);
-					var charas = player.storage.qi_huashen.owned;
-					for(var i in charas){
-						if(charas[i].indexOf(trigger.skill)!=-1) {
-							delete player.storage.qi_huashen.owned[i];
-							player.storage.qi_huashen.list.push(i);
-						}
-					}
-					player.marks.qi_huashen.hide();
+                    var charas = player.storage.qi_huashen.owned;
+                    for(var i in charas){
+                        if(charas[i].indexOf(trigger.skill)!=-1) {
+                            delete player.storage.qi_huashen.owned[i];
+                            player.storage.qi_huashen.list.push(i);
+                        }
+                    }
+                    player.marks.qi_huashen.hide();
                 },
             },
-			qi_xinsheng:{
-			audio:2,
-			unique:true,
-			trigger:{player:'damageEnd'},
-			frequent:true,
-			filter:function(event,player){
-				return player.storage.qi_huashen&&player.storage.qi_huashen.list&&
-					player.storage.qi_huashen.list.length>0;
-			},
-			content:function(){
-				lib.skill.qi_huashen.get(player);
-			}
-		},
+            qi_xinsheng:{
+                audio:"ext:无名扩展:2",
+                unique:true,
+                trigger:{
+                    player:"damageEnd",
+                },
+                frequent:true,
+                filter:function (event,player){
+                return player.storage.qi_huashen&&player.storage.qi_huashen.list&&
+                    player.storage.qi_huashen.list.length>0;
+            },
+                content:function (){
+					console.log('xinshen')
+                lib.skill.qi_huashen.get(player,1,true);
+            },
+            },
         },
         translate:{
             去除技能:"去除技能",

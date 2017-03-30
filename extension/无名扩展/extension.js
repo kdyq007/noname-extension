@@ -200,6 +200,7 @@ game.import("extension",{name:"无名扩展",content:function (config,pack){
                 'step 1'
                 var owners = result.links.length;
                 if(owners==1){
+                	player.storage.huashen.owned[result.links[0]]=lib.character[result.links[0]][3].slice(0);
                     var myowners=[];
                     for(var i in player.storage.huashen.owned){
                         myowners.push(i);
@@ -208,7 +209,8 @@ game.import("extension",{name:"无名扩展",content:function (config,pack){
                     game.me.chooseButton(dialog,true).selectButton=function(){
                         return [selected,selected];
                     };
-
+                    'step 2'
+                    delete player.storage.huashen.owned[result.links[0]];
                 }
                 else{
                    for(var i=0;i<pwners;i++){
